@@ -5,7 +5,7 @@ Run graphics.h Programs Online using Turbo C Wrapper
 **Live Demo / Online Compiler:** [https://graphics-h-compiler.vercel.app/](https://graphics-h-compiler.vercel.app/)
 
 <p align="center">
-  <img src="screenshot.png" alt="Online graphics.h Compiler Turbo C Wrapper" width="800">
+  <img src="demo.png" alt="Online graphics.h Compiler Turbo C Wrapper" width="800">
 </p>
 
 ## Overview
