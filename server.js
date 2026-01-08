@@ -12,7 +12,7 @@ const PORT = process.env.PORT || 3000;
 // Configuration
 const BASE_DISPLAY = 100;
 const BASE_XPRA_PORT = 10000;
-const MAX_SESSIONS = 5;
+const MAX_SESSIONS = 2; // Reduced for Render deployment
 const SESSION_TIMEOUT = 10 * 60 * 1000; // 10 minutes
 
 // Global State
@@ -202,7 +202,7 @@ class Session {
                 }
                 
                 const xpraCmd = `xpra start ${display} \
-                    --bind-tcp=127.0.0.1:${this.port} \
+                    --bind-tcp=0.0.0.0:${this.port} \
                     --daemon=no \
                     --dpi=96 \
                     --sharing=yes \
@@ -473,7 +473,7 @@ const sessionProxy = createProxyMiddleware({
         if (match && match[1]) {
             const session = sessions.get(match[1]);
             if (session && session.streamReady) {
-                return `http://127.0.0.1:${session.port}`;
+                return `http://localhost:${session.port}`;
             }
         }
         return null;
