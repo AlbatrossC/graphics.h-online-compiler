@@ -7,6 +7,11 @@ ENV DEBIAN_FRONTEND=noninteractive
 ENV TZ=UTC
 
 # =========================
+# FIX 1: Disable Xpra SSL during build
+# =========================
+ENV XPRA_NOSSL=1
+
+# =========================
 # Base tools + Node 20
 # =========================
 RUN apt-get update && \
@@ -55,7 +60,7 @@ RUN wget -q https://raw.githubusercontent.com/acsfid/graphics.h/main/graphics.h 
     wget -q https://raw.githubusercontent.com/acsfid/graphics.h/main/libbgi.a \
         -O /usr/local/lib/graphics_h/libbgi.a
 
-# --- const-correctness patch (same as WSL script)
+
 # ---- const-correctness patch (SAFE, targeted)
 RUN sed -i 's/void initgraph( int \*graphdriver, int \*graphmode, char \*pathtodriver )/void initgraph( int *graphdriver, int *graphmode, const char *pathtodriver )/g' /usr/local/include/graphics_h/graphics.h && \
     sed -i 's/void initgraph(int\*, int\*, char\*)/void initgraph(int*, int*, const char*)/g' /usr/local/include/graphics_h/graphics.h && \
@@ -114,17 +119,20 @@ RUN mkdir -p /etc/apt/keyrings && \
     rm -rf /var/lib/apt/lists/*
 
 # =========================
-# Wine template (matches ~/.wine32_graphics)
+# FIX 1 (continued): Prevent Xpra cert generation
 # =========================
-ENV WINEARCH=win32
-ENV WINEPREFIX=/opt/wine-template
-ENV DISPLAY=:99
+RUN mkdir -p /etc/xpra/ssl && \
+    touch /etc/xpra/ssl/key.pem /etc/xpra/ssl/cert.pem
 
-RUN Xvfb :99 -screen 0 1024x768x16 & \
-    sleep 2 && \
-    wineboot -u && \
-    sleep 5 && \
-    wineserver -k || true
+# =========================
+# FIX 2: DO NOT run wineboot during build
+# Wine prefix will be created at runtime
+# =========================
+# REMOVED: The problematic wineboot initialization
+# This was causing IPC issues during Render build
+# Wine prefixes are now created per-session at runtime
+
+ENV WINEARCH=win32
 
 # =========================
 # Application
